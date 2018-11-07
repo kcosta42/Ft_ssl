@@ -1,0 +1,27 @@
+allowed functions:
+◦ open
+◦ close
+◦ read
+◦ write
+◦ malloc
+◦ free
+
+bonus functions:
+◦ fstats
+
+parse args:
+foreach arg
+	check first char
+	if '-':
+		enableFlags unless flag not recognized
+		if 's' flag enable:
+			exec(arg + offset after s flag)
+			disable 's' flag
+	if 's' Flag enable:
+		exec(arg)
+		disable 's' flag
+	else
+		fd = open(arg)
+		read(fd)
+		exec(arg)
+		close(fd)
