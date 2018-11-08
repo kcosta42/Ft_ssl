@@ -6,7 +6,7 @@
 /*   By: kcosta <kcosta@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/07 14:53:15 by kcosta            #+#    #+#             */
-/*   Updated: 2018/11/07 17:56:32 by kcosta           ###   ########.fr       */
+/*   Updated: 2018/11/08 11:44:10 by kcosta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,14 +21,14 @@ t_digest g_digest[3] =
 
 static int	usage(char *cmd)
 {
-	ft_putstr("ft_ssl: Error: '");
-	ft_putstr(cmd);
-	ft_putendl("' is an invalid command.");
-	ft_putendl("\nStandard commands:");
-	ft_putendl("\nMessage Digest commands:");
-	ft_putendl("md5");
-	ft_putendl("sha256");
-	ft_putendl("\nCipher commands:");
+	ft_putstr_fd("ft_ssl: Error: '", 2);
+	ft_putstr_fd(cmd, 2);
+	ft_putendl_fd("' is an invalid command.", 2);
+	ft_putendl_fd("\nStandard commands:", 2);
+	ft_putendl_fd("\nMessage Digest commands:", 2);
+	ft_putendl_fd("md5", 2);
+	ft_putendl_fd("sha256", 2);
+	ft_putendl_fd("\nCipher commands:", 2);
 	return (0);
 }
 

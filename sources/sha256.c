@@ -6,7 +6,7 @@
 /*   By: kcosta <kcosta@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/07 16:07:58 by kcosta            #+#    #+#             */
-/*   Updated: 2018/11/07 18:11:10 by kcosta           ###   ########.fr       */
+/*   Updated: 2018/11/08 12:06:24 by kcosta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ static int	usage(void)
 	return (0);
 }
 
-int		sha256(int argc, char **argv)
+int			sha256(int argc, char **argv)
 {
 	(void)argc;
 	(void)argv;

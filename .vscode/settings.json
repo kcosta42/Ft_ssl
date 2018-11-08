@@ -8,6 +8,7 @@
 		"inet.h": "c",
 		"server.h": "c",
 		"ft_print.h": "c",
-		"ft_ssl.h": "c"
+		"ft_ssl.h": "c",
+		"sha256.h": "c"
 	}
 }

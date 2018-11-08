@@ -6,7 +6,7 @@
 #    By: kcosta <kcosta@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/08/16 19:08:49 by kcosta            #+#    #+#              #
-#    Updated: 2018/11/07 19:16:15 by kcosta           ###   ########.fr        #
+#    Updated: 2018/11/08 18:46:56 by kcosta           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,15 +16,19 @@ NAME	:= ft_ssl
 
 # ========== Standard ========== #
 CC		:= gcc
-FLAGS	:= -Wall -Wextra -Werror #-g -fsanitize=address
+FLAGS	:= -Wall -Wextra -Werror -g #-fsanitize=address
 # ============================== #
 
 # =========== Files ============ #
-SRCS_FILES		:=	ft_ssl.c	\
-					md5.c		\
+SRCS_FILES		:=	ft_ssl.c				\
+					md5.c					\
+					md5_utils.c				\
+					md5_digest.c			\
+					md5_transform.c			\
+					md5_transform_utils.c	\
 					sha256.c
-HEADERS_FILES	:=	ft_ssl.h	\
-					md5.h		\
+HEADERS_FILES	:=	ft_ssl.h				\
+					md5.h					\
 					sha256.h
 # ============================== #
 
