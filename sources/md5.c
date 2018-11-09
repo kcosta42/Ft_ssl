@@ -6,7 +6,7 @@
 /*   By: kcosta <kcosta@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/07 16:07:55 by kcosta            #+#    #+#             */
-/*   Updated: 2018/11/08 14:53:42 by kcosta           ###   ########.fr       */
+/*   Updated: 2018/11/09 14:17:09 by kcosta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,28 +20,30 @@ static int	err_msg(char *msg, char *arg, int errnum)
 	return (errnum);
 }
 
-int			manage_string(uint8_t *flags, char *str, char *content, size_t len)
+int			md5_manage_string(uint8_t *flags, char *str, char *c, size_t len)
 {
-	*flags |= MD5_END;
+	*flags |= MD5_INPUT;
 	if (!((*flags & MD5_R) || (*flags & MD5_Q)))
 	{
-		ft_putstr("MD5 (\"");
+		ft_putstr("MD5 (");
+		*flags & MD5_END ? 0 : ft_putstr("\"");
 		ft_putstr(str);
-		ft_putstr("\") = ");
+		*flags & MD5_END ? 0 : ft_putstr("\"");
+		ft_putstr(") = ");
 	}
-	ft_putstr(md5_digest(content, len));
+	ft_putstr(md5_digest(c, len));
 	if ((*flags & MD5_R) && !(*flags & MD5_Q))
 	{
-		ft_putstr(" \"");
+		*flags & MD5_END ? ft_putstr(" ") : ft_putstr(" \"");
 		ft_putstr(str);
-		ft_putstr("\"");
+		*flags & MD5_END ? 0 : ft_putstr("\"");
 	}
 	ft_putendl("");
 	*flags ^= MD5_S;
 	return (0);
 }
 
-int			manage_file(uint8_t *flags, char *filename)
+int			md5_manage_file(uint8_t *flags, char *filename)
 {
 	struct stat	st_stat;
 	char		*content;
@@ -61,21 +63,26 @@ int			manage_file(uint8_t *flags, char *filename)
 	read(fd, content, st_stat.st_size);
 	close(fd);
 	*flags |= MD5_S;
-	manage_string(flags, filename, content, st_stat.st_size);
+	md5_manage_string(flags, filename, content, st_stat.st_size);
 	ft_strdel(&content);
 	return (0);
 }
 
-int			manage_stdin(uint8_t *flags, uint8_t echo)
+int			md5_manage_stdin(uint8_t *flags, uint8_t echo)
 {
 	size_t	size;
 	char	*buff;
+	char	tmp;
 
+	*flags |= MD5_INPUT;
 	size = ft_readfile(0, &buff);
 	if (echo)
 	{
+		tmp = buff[size - 1];
+		buff[size - 1] = 0;
 		ft_putendl(buff);
 		*flags ^= MD5_P;
+		buff[size - 1] = tmp;
 	}
 	ft_putendl(md5_digest(buff, size));
 	ft_strdel(&buff);
@@ -84,6 +91,6 @@ int			manage_stdin(uint8_t *flags, uint8_t echo)
 
 int			md5(int argc, char **argv)
 {
-	parse_args(argc, argv);
+	md5_parse_args(argc, argv);
 	return (0);
 }

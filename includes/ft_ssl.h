@@ -6,7 +6,7 @@
 /*   By: kcosta <kcosta@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/07 15:25:17 by kcosta            #+#    #+#             */
-/*   Updated: 2018/11/08 12:06:39 by kcosta           ###   ########.fr       */
+/*   Updated: 2018/11/09 13:35:14 by kcosta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,6 @@
 # define FT_SSL_H
 
 # include "libft.h"
-
-# include "md5.h"
-# include "sha256.h"
 
 # include <string.h>
 
@@ -26,5 +23,8 @@ typedef struct	s_digest
 	char		*cmd;
 	int			(*exec)(int, char **);
 }				t_digest;
+
+int				md5(int argc, char **argv);
+int				sha256(int argc, char **argv);
 
 #endif

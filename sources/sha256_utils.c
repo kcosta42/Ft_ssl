@@ -1,23 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   md5_utils.c                                        :+:      :+:    :+:   */
+/*   sha256_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kcosta <kcosta@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/11/08 11:55:23 by kcosta            #+#    #+#             */
-/*   Updated: 2018/11/09 14:17:41 by kcosta           ###   ########.fr       */
+/*   Created: 2018/11/09 14:05:39 by kcosta            #+#    #+#             */
+/*   Updated: 2018/11/09 14:14:50 by kcosta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "md5.h"
+#include "sha256.h"
 
-t_md5_flags	g_md5_flags[5] =
+t_sha256_flags	g_sha256_flags[5] =
 {
-	{ MD5_P, 'p' },
-	{ MD5_Q, 'q' },
-	{ MD5_R, 'r' },
-	{ MD5_S, 's' },
+	{ SHA256_P, 'p' },
+	{ SHA256_Q, 'q' },
+	{ SHA256_R, 'r' },
+	{ SHA256_S, 's' },
 	{ 0, 0 },
 };
 
@@ -26,11 +26,11 @@ static int	search_flag(uint8_t *flags, char arg)
 	int		idx;
 
 	idx = 0;
-	while (g_md5_flags[idx].flag)
+	while (g_sha256_flags[idx].flag)
 	{
-		if (arg == g_md5_flags[idx].c)
+		if (arg == g_sha256_flags[idx].c)
 		{
-			*flags |= g_md5_flags[idx].flag;
+			*flags |= g_sha256_flags[idx].flag;
 			return (0);
 		}
 		idx++;
@@ -40,39 +40,39 @@ static int	search_flag(uint8_t *flags, char arg)
 
 static int	usage(char *msg, char arg, int errnum)
 {
-	ft_putstr_fd("md5: ", 2);
+	ft_putstr_fd("sha256: ", 2);
 	ft_putstr_fd(msg, 2);
 	ft_putstr_fd(" -- ", 2);
 	ft_putchar_fd(arg, 2);
-	ft_putendl_fd("\nUsage: md5 [-pqrtx] [-s string] [files ...]", 2);
+	ft_putendl_fd("\nUsage: sha256 [-pqrtx] [-s string] [files ...]", 2);
 	return (errnum);
 }
 
 static int	manage_args(uint8_t *flags, char *arg)
 {
-	if (!(*flags & MD5_END) && *arg == '-')
+	if (!(*flags & SHA256_END) && *arg == '-')
 	{
 		while (*(++arg))
 		{
-			if (*flags & MD5_S)
+			if (*flags & SHA256_S)
 			{
-				md5_manage_string(flags, arg, arg, ft_strlen(arg));
+				sha256_manage_string(flags, arg, arg, ft_strlen(arg));
 				break ;
 			}
 			if (search_flag(flags, *arg))
 				return (usage("illegal option", *arg, 1));
-			if (*flags & MD5_P)
-				md5_manage_stdin(flags, 1);
+			if (*flags & SHA256_P)
+				sha256_manage_stdin(flags, 1);
 		}
 	}
-	else if (*flags & MD5_S)
-		md5_manage_string(flags, arg, arg, ft_strlen(arg));
+	else if (*flags & SHA256_S)
+		sha256_manage_string(flags, arg, arg, ft_strlen(arg));
 	else
-		md5_manage_file(flags, arg);
+		sha256_manage_file(flags, arg);
 	return (0);
 }
 
-int			md5_parse_args(int argc, char **argv)
+int			sha256_parse_args(int argc, char **argv)
 {
 	int		idx;
 	uint8_t	flags;
@@ -80,7 +80,7 @@ int			md5_parse_args(int argc, char **argv)
 
 	idx = 0;
 	if (!argc)
-		return (md5_manage_stdin(&flags, 0));
+		return (sha256_manage_stdin(&flags, 0));
 	while (idx < argc)
 	{
 		arg = argv[idx];
@@ -88,9 +88,9 @@ int			md5_parse_args(int argc, char **argv)
 			return (1);
 		idx++;
 	}
-	if (flags & MD5_S)
+	if (flags & SHA256_S)
 		return (usage("option requires an argument", 's', 1));
-	if (!(flags & MD5_INPUT))
-		return (md5_manage_stdin(&flags, 0));
+	if (!(flags & SHA256_INPUT))
+		return (sha256_manage_stdin(&flags, 0));
 	return (0);
 }
