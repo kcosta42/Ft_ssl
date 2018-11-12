@@ -6,7 +6,7 @@
 /*   By: kcosta <kcosta@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/09 14:12:07 by kcosta            #+#    #+#             */
-/*   Updated: 2018/11/09 17:58:54 by kcosta           ###   ########.fr       */
+/*   Updated: 2018/11/12 12:06:13 by kcosta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,41 @@ static uint32_t	g_sha256_h0[SHA256_HASH_SIZE / 4] = {
 	0x6A09E667, 0xBB67AE85, 0x3C6EF372, 0xA54FF53A,
 	0x510E527F, 0x9B05688C, 0x1F83D9AB, 0x5BE0CD19
 };
+
+int		sha256_rotr(uint32_t bits, uint32_t word)
+{
+	return ((((word) >> (bits)) | ((word) << (32 - (bits)))));
+}
+
+int		sha256_sigma0(uint32_t w)
+{
+	return (sha256_rotr(2, w) ^ sha256_rotr(13, w) ^ sha256_rotr(22, w));
+}
+
+int		sha256_sigma1(uint32_t w)
+{
+	return (sha256_rotr(6, w) ^ sha256_rotr(11, w) ^ sha256_rotr(25, w));
+}
+
+int		sha256_sigma2(uint32_t word)
+{
+	return (sha256_rotr(7, word) ^ sha256_rotr(18, word) ^ (word >> 3));
+}
+
+int		sha256_sigma3(uint32_t word)
+{
+	return (sha256_rotr(17, word) ^ sha256_rotr(19, word) ^ (word >> 10));
+}
+
+int				sha256_addlength(t_sha256_context *context, uint32_t length)
+{
+	uint32_t	addtemp;
+
+	addtemp = context->length_low;
+	return (context->corrupted = ((context->length_low += length) < addtemp)
+			&& (++context->length_high == 0) ?
+				SHA256_INPUT_TOO_LONG : context->corrupted);
+}
 
 int				sha256_reset(t_sha256_context *context)
 {
@@ -60,72 +95,65 @@ static uint32_t	sha256_k(uint8_t idx)
 
 static void		sha256_process_message_block(t_sha256_context *context)
 {
-	int						t;
-	int						t4;
-	uint32_t				temp1;
-	uint32_t				temp2;
-	uint32_t				w[64];
-	uint32_t				a;
-	uint32_t				b;
-	uint32_t				c;
-	uint32_t				d;
-	uint32_t				e;
-	uint32_t				f;
-	uint32_t				g;
-	uint32_t				h;
+	int				t;
+	int				t4;
+	uint32_t		temp1;
+	uint32_t		temp2;
+	t_sha256_env	e;
 
 	t = 0;
 	t4 = 0;
 	while (t < 16)
 	{
-		w[t] = (((uint32_t)context->message_block[t4]) << 24) |
-			(((uint32_t)context->message_block[t4 + 1]) << 16) |
-			(((uint32_t)context->message_block[t4 + 2]) << 8) |
-			(((uint32_t)context->message_block[t4 + 3]));
+		e.w[t] = (((uint32_t)context->message_block[t4]) << 24) |
+				(((uint32_t)context->message_block[t4 + 1]) << 16) |
+				(((uint32_t)context->message_block[t4 + 2]) << 8) |
+				(((uint32_t)context->message_block[t4 + 3]));
 		t++;
 		t4 += 4;
 	}
 	t = 16;
 	while (t < 64)
 	{
-		w[t] = SHA256_sigma1(w[t - 2]) + w[t - 7] + SHA256_sigma0(w[t - 15]) + w[t - 16];
+		e.w[t] = sha256_sigma3(e.w[t - 2]) + e.w[t - 7] + sha256_sigma2(e.w[t - 15]) + e.w[t - 16];
 		t++;
 	}
-	a = context->intermediate_hash[0];
-	b = context->intermediate_hash[1];
-	c = context->intermediate_hash[2];
-	d = context->intermediate_hash[3];
-	e = context->intermediate_hash[4];
-	f = context->intermediate_hash[5];
-	g = context->intermediate_hash[6];
-	h = context->intermediate_hash[7];
+	e.a = context->intermediate_hash[0];
+	e.b = context->intermediate_hash[1];
+	e.c = context->intermediate_hash[2];
+	e.d = context->intermediate_hash[3];
+	e.e = context->intermediate_hash[4];
+	e.f = context->intermediate_hash[5];
+	e.g = context->intermediate_hash[6];
+	e.h = context->intermediate_hash[7];
 	t = 0;
 	while (t < 64)
 	{
-		temp1 = h + SHA256_SIGMA1(e) + SHA_Ch(e, f, g) + sha256_k(t) + w[t];
-		temp2 = SHA256_SIGMA0(a) + SHA_Maj(a, b, c);
-		h = g;
-		g = f;
-		f = e;
-		e = d + temp1;
-		d = c;
-		c = b;
-		b = a;
-		a = temp1 + temp2;
+		temp1 = e.h + sha256_sigma1(e.e) + ((e.e & e.f) ^ ((~e.e) & e.g)) + sha256_k(t) + e.w[t];
+		temp2 = sha256_sigma0(e.a) + ((e.a & e.b) ^ (e.a & e.c) ^ (e.b & e.c));
+		e.h = e.g;
+		e.g = e.f;
+		e.f = e.e;
+		e.e = e.d + temp1;
+		e.d = e.c;
+		e.c = e.b;
+		e.b = e.a;
+		e.a = temp1 + temp2;
 		t++;
 	}
-	context->intermediate_hash[0] += a;
-	context->intermediate_hash[1] += b;
-	context->intermediate_hash[2] += c;
-	context->intermediate_hash[3] += d;
-	context->intermediate_hash[4] += e;
-	context->intermediate_hash[5] += f;
-	context->intermediate_hash[6] += g;
-	context->intermediate_hash[7] += h;
+	context->intermediate_hash[0] += e.a;
+	context->intermediate_hash[1] += e.b;
+	context->intermediate_hash[2] += e.c;
+	context->intermediate_hash[3] += e.d;
+	context->intermediate_hash[4] += e.e;
+	context->intermediate_hash[5] += e.f;
+	context->intermediate_hash[6] += e.g;
+	context->intermediate_hash[7] += e.h;
 	context->message_block_index = 0;
 }
 
-int				sha256_input(t_sha256_context *context, const uint8_t *message_array, unsigned int length)
+int				sha256_input(t_sha256_context *context,
+	const uint8_t *message_array, unsigned int length)
 {
 	if (!context)
 		return (SHA256_NULL);
@@ -140,7 +168,8 @@ int				sha256_input(t_sha256_context *context, const uint8_t *message_array, uns
 	while (length--)
 	{
 		context->message_block[context->message_block_index++] = *message_array;
-		if ((sha256_addlength(context, 8) == SHA256_SUCCESS) && (context->message_block_index == SHA256_MESSAGE_BLOCK_SIZE))
+		if ((sha256_addlength(context, 8) == SHA256_SUCCESS)
+			&& (context->message_block_index == SHA256_MESSAGE_BLOCK_SIZE))
 			sha256_process_message_block(context);
 		message_array++;
 	}
@@ -187,7 +216,8 @@ static void		sha256_finalize(t_sha256_context *context, uint8_t pad_byte)
 	context->computed = 1;
 }
 
-int				sha256_finalbits(t_sha256_context *context, uint8_t message_bits, unsigned int length)
+int				sha256_finalbits(t_sha256_context *context,
+	uint8_t message_bits, unsigned int length)
 {
 	static uint8_t masks[8] = {
 		0x00, 0x80, 0xC0, 0xE0,
@@ -209,11 +239,13 @@ int				sha256_finalbits(t_sha256_context *context, uint8_t message_bits, unsigne
 	if (length >= 8)
 		return (context->corrupted = SHA256_BAD_PARAM);
 	sha256_addlength(context, length);
-	sha256_finalize(context, (uint8_t)((message_bits & masks[length]) | markbit[length]));
+	sha256_finalize(context,
+		(uint8_t)((message_bits & masks[length]) | markbit[length]));
 	return (context->corrupted);
 }
 
-int				sha256_result(t_sha256_context *context, uint8_t message_digest[SHA256_HASH_SIZE])
+int				sha256_result(t_sha256_context *context,
+	uint8_t message_digest[SHA256_HASH_SIZE])
 {
 	int i;
 
@@ -228,7 +260,8 @@ int				sha256_result(t_sha256_context *context, uint8_t message_digest[SHA256_HA
 	i = 0;
 	while (i < SHA256_HASH_SIZE)
 	{
-		message_digest[i] = (uint8_t)(context->intermediate_hash[i >> 2] >> 8 * (3 - (i & 0x03)));
+		message_digest[i] = (uint8_t)
+			(context->intermediate_hash[i >> 2] >> 8 * (3 - (i & 0x03)));
 		i++;
 	}
 	return (SHA256_SUCCESS);
