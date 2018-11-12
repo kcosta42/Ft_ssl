@@ -6,7 +6,7 @@
 /*   By: kcosta <kcosta@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/07 14:53:15 by kcosta            #+#    #+#             */
-/*   Updated: 2018/11/08 11:44:10 by kcosta           ###   ########.fr       */
+/*   Updated: 2018/11/12 14:38:08 by kcosta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ static int	usage(char *cmd)
 	return (0);
 }
 
-int			dispatcher(int argc, char **argv)
+static int	dispatcher(int argc, char **argv)
 {
 	int		i;
 	char	*cmd;
@@ -50,12 +50,26 @@ int			dispatcher(int argc, char **argv)
 	return (usage(cmd));
 }
 
+static int	ft_ssl(void)
+{
+	char	*input;
+
+	ft_putstr("Ft_SSL> ");
+	while (ft_getline(1, &input) > 0)
+	{
+		dispatcher(1, &input);
+		ft_strdel(&input);
+		ft_putstr("Ft_SSL> ");
+	}
+	return (0);
+}
+
 int			main(int argc, char **argv)
 {
 	int		ret;
 
 	if (argc < 2)
-		return (-1); // ADD Command line
+		return (ft_ssl());
 	ret = dispatcher(argc - 1, argv + 1);
 	return (ret);
 }

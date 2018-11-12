@@ -6,7 +6,7 @@
 /*   By: kcosta <kcosta@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/07 16:04:00 by kcosta            #+#    #+#             */
-/*   Updated: 2018/11/12 11:25:59 by kcosta           ###   ########.fr       */
+/*   Updated: 2018/11/12 13:05:15 by kcosta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,18 @@ typedef struct	s_sha256_env
 }				t_sha256_env;
 
 char			*sha256_digest(char *str, size_t len);
+
+uint32_t		sha256_k(uint8_t idx);
+int				sha256_rotr(uint32_t bits, uint32_t word);
+int				sha256_sigma0(uint32_t w);
+int				sha256_sigma1(uint32_t w);
+int				sha256_sigma2(uint32_t word);
+int				sha256_sigma3(uint32_t word);
+
+int				sha256_addlength(t_sha256_context *context, uint32_t length);
+void			sha256_process_message_block(t_sha256_context *context);
+void			sha256_pad_message(t_sha256_context *c, uint8_t pad_byte);
+void			sha256_finalize(t_sha256_context *context, uint8_t pad_byte);
 
 int				sha256_parse_args(int argc, char **argv);
 

@@ -6,7 +6,7 @@
 #    By: kcosta <kcosta@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/08/16 19:08:49 by kcosta            #+#    #+#              #
-#    Updated: 2018/11/09 16:51:25 by kcosta           ###   ########.fr        #
+#    Updated: 2018/11/12 13:01:06 by kcosta           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,7 +29,10 @@ SRCS_FILES		:=	ft_ssl.c				\
 					md5_transform_utils.c	\
 					sha256.c				\
 					sha256_utils.c			\
-					sha256_digest.c
+					sha256_digest.c			\
+					sha256_digest_utils.c	\
+					sha256_transform.c		\
+					sha256_transform_utils.c
 HEADERS_FILES	:=	ft_ssl.h				\
 					md5.h					\
 					sha256.h
